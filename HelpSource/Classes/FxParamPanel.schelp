@@ -1,0 +1,51 @@
+TITLE:: FxParamPanel
+summary:: an FxParamUnit's controls as one view
+categories:: Libraries>FxKit
+related:: Classes/FxParamUnit, Classes/FxParamGUI, Classes/FxChainPanel
+
+DESCRIPTION::
+The top row, the display, and a row of knobs per section of the table. It is what link::Classes/FxParamGUI:: and link::Classes/FxChainPanel:: show.
+
+code::
+t = Tunnel.new;
+w = Window("mine", Rect(100, 100, 860, 600));
+p = FxParamPanel(t);
+w.layout = VLayout(p.view);
+w.onClose = { p.remove };
+w.front;
+p.running = true;
+::
+
+CLASSMETHODS::
+
+METHOD:: new
+It follows one unit.
+ARGUMENT:: unit
+ARGUMENT:: parent
+
+INSTANCEMETHODS::
+
+METHOD:: view
+The view.
+
+METHOD:: unit
+What it follows.
+
+METHOD:: display
+The unit's display.
+
+METHOD:: bars
+Its level bars.
+
+METHOD:: running
+Meters and display, while it is on screen.
+
+METHOD:: hints
+An link::Classes/FxHintBar::.
+
+METHOD:: refresh
+Everything from the unit.
+
+METHOD:: remove
+In window.onClose.
+

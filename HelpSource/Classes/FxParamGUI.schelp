@@ -1,0 +1,36 @@
+TITLE:: FxParamGUI
+summary:: one effect in a window of its own
+categories:: Libraries>FxKit
+related:: Classes/FxParamUnit, Classes/FxParamPanel
+
+DESCRIPTION::
+What code::unit.gui:: opens: the panel, a status line, and a hint bar.
+
+CLASSMETHODS::
+
+METHOD:: new
+
+ARGUMENT:: unit
+ARGUMENT:: x
+ARGUMENT:: y
+
+INSTANCEMETHODS::
+
+METHOD:: unit
+
+
+METHOD:: window
+
+
+METHOD:: panel
+
+
+METHOD:: hints
+
+
+METHOD:: front
+
+
+METHOD:: close
+
+

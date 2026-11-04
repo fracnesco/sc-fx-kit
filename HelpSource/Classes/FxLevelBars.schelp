@@ -1,0 +1,25 @@
+TITLE:: FxLevelBars
+summary:: input and output bars with held peaks
+categories:: Libraries>FxKit
+related:: Classes/FxParamPanel
+
+DESCRIPTION::
+Two bars; a click drops the peak marks. It reads code::inLevel:: and code::outLevel:: from its unit.
+
+CLASSMETHODS::
+
+METHOD:: new
+
+ARGUMENT:: unit
+
+INSTANCEMETHODS::
+
+METHOD:: view
+
+
+METHOD:: unit
+
+
+METHOD:: refresh
+
+

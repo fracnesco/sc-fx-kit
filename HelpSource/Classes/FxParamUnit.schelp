@@ -1,0 +1,179 @@
+TITLE:: FxParamUnit
+summary:: an effect written as a table of its parameters
+categories:: Libraries>FxKit
+related:: Classes/FxUnit, Classes/FxParamPanel, Classes/FxParamView, Classes/FxLoop
+
+DESCRIPTION::
+A link::Classes/FxUnit:: whose settings, presets, clipboard, meters and window are worked out from one list. A subclass writes code::*params:: and code::*process::, and usually code::*presetList:: and code::*displayClass::. It runs in a graph, on a bus, or in an link::Classes/FxChain::; if SuperDirtGUI is installed it is an insert too.
+
+Each parameter is also a property, through code::doesNotUnderstand::, so a real method of the same name wins: do not name a parameter code::rate::, code::size::, code::shape:: or code::freeze::. A table with such a name warns when it is first read.
+
+The table's order is what saved node maps carry: append, never reorder.
+
+code::
+Ndef(\pad, { Tunnel.ar(Saw.ar(110) ! 2 * 0.2, \tunnel) }).play;
+t = Tunnel(Ndef(\pad), \tunnel);
+t.feedback = 0.7;
+t.get(\feedback);
+t.set(\feedback, 0.5);
+t.gui;
+t.free; Ndef(\pad).clear;
+::
+
+CLASSMETHODS::
+
+METHOD:: params
+Subclass: the table, an Array of what code::knob::, code::menu:: and code::toggle:: answer.
+
+METHOD:: process
+Subclass: the DSP. sig is an Array of channels, p the parameters by key as control rate signals. Set the Event ctx's code::dry:: when the wet is late, its code::extras:: for what a display wants. Answers the wet.
+ARGUMENT:: sig
+ARGUMENT:: p
+ARGUMENT:: ctx
+
+METHOD:: presetList
+Subclass: a name, then the settings that differ from the table's defaults, and so on.
+
+METHOD:: hasTail
+Subclass: true if it goes on sounding after its input has stopped.
+
+METHOD:: displayClass
+Subclass: its display, a subclass of link::Classes/FxParamView::, or nil.
+
+METHOD:: panelExtras
+Subclass: more widgets for the panel's top row.
+ARGUMENT:: panel
+
+METHOD:: windowSize
+Subclass: a Point.
+
+METHOD:: title
+What a window calls it.
+
+METHOD:: insertKind
+What SuperDirtGUI calls this kind of insert.
+
+METHOD:: insertLabel
+What its button says.
+
+METHOD:: knob
+A table entry. box says what the number box shows: code::\ms::, code::\pct:: or nil. lag is the control's smoothing, 0.05 unless said. section is the row it goes in; nil has no widget.
+ARGUMENT:: key
+ARGUMENT:: lo
+ARGUMENT:: hi
+ARGUMENT:: warp
+ARGUMENT:: default
+ARGUMENT:: units
+ARGUMENT:: label
+ARGUMENT:: hint
+ARGUMENT:: box
+ARGUMENT:: lag
+ARGUMENT:: section
+ARGUMENT:: dec
+ARGUMENT:: step
+
+METHOD:: menu
+A table entry.
+ARGUMENT:: key
+ARGUMENT:: items
+ARGUMENT:: default
+ARGUMENT:: label
+ARGUMENT:: hint
+ARGUMENT:: section
+
+METHOD:: toggle
+A table entry.
+ARGUMENT:: key
+ARGUMENT:: default
+ARGUMENT:: label
+ARGUMENT:: hint
+ARGUMENT:: section
+
+METHOD:: mixParams
+The two table entries most effects end on: code::mix:: and code::output::.
+ARGUMENT:: section
+ARGUMENT:: mix
+
+METHOD:: ar
+The effect as a UGen, reading a control called name.
+ARGUMENT:: in
+ARGUMENT:: name
+ARGUMENT:: bypass
+
+METHOD:: table
+The table, worked out once.
+
+METHOD:: paramNames
+Its keys, in order.
+
+METHOD:: param
+One entry.
+ARGUMENT:: key
+
+METHOD:: specs
+The knobs' ControlSpecs, by key.
+
+METHOD:: sections
+The rows, in the order the table first says them.
+
+METHOD:: presetNames
+The menu: built in, then yours.
+
+METHOD:: addPreset
+Keep some settings under a name.
+ARGUMENT:: name
+ARGUMENT:: settings
+
+METHOD:: removePreset
+Drop one of yours.
+ARGUMENT:: name
+
+METHOD:: hasClipboard
+Whether something has been copied, of this class.
+
+INSTANCEMETHODS::
+
+METHOD:: set
+Set a parameter by name. A knob clips to its range.
+ARGUMENT:: key
+ARGUMENT:: value
+
+METHOD:: get
+Read one by name.
+ARGUMENT:: key
+
+METHOD:: settings
+All of them, as an Event: what a preset and the clipboard hold. Setting it ignores what it does not know and leaves alone what it does not say.
+
+METHOD:: presetName
+Which preset these settings are, or nil.
+
+METHOD:: saveAsPreset
+Keep them, in this session and the next.
+ARGUMENT:: name
+
+METHOD:: copySettings
+Put them aside, for one of the same class.
+
+METHOD:: pasteSettings
+Take them.
+
+METHOD:: copyFrom
+Take another's.
+ARGUMENT:: other
+
+METHOD:: meter
+Whether its node reports levels. A window turns this on while it is open.
+
+METHOD:: inLevel
+The input's peak, from the last reply.
+
+METHOD:: outLevel
+The output's.
+
+METHOD:: extras
+What the DSP asked to report, from the last reply.
+
+METHOD:: isAlive
+Whether a reply has come in the last second.
+

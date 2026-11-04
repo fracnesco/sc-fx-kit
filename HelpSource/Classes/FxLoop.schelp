@@ -1,0 +1,58 @@
+TITLE:: FxLoop
+summary:: a delay line with feedback that needs no LocalIn
+categories:: Libraries>FxKit
+related:: Classes/FxParamUnit, Classes/LocalBuf
+
+DESCRIPTION::
+A SynthDef can have one LocalIn, and two effects of this family must be able to share a graph, so feedback goes through a buffer: one LocalBuf per channel, written at a phasor, read as far behind as you like, as often as you like. Use it inside a SynthDef function. Read first, then write what the reads made. The shortest delay is a block and a few samples. It costs 4 bytes a frame of the server's real time memory.
+
+code::
+{
+	var sig = Decay2.kr(Impulse.kr(1), 0.01, 0.1) * PinkNoise.ar(0.2 ! 2);
+	var l = FxLoop(2, 1);
+	var y = l.read(0.25);
+	l.write(sig + (y * 0.6));
+	sig + y
+}.play;
+::
+
+CLASSMETHODS::
+
+METHOD:: new
+run: 1 goes on writing, 0 stands still.
+ARGUMENT:: numChannels
+ARGUMENT:: maxTime
+ARGUMENT:: run
+
+METHOD:: minTime
+The shortest delay, a signal.
+
+INSTANCEMETHODS::
+
+METHOD:: read
+Seconds behind the head, one or one per channel. Answers an Array of channels.
+ARGUMENT:: time
+ARGUMENT:: interpolation
+
+METHOD:: write
+An Array of channels, cleaned of NaNs.
+ARGUMENT:: sig
+
+METHOD:: writePhase
+The frame the head is on, a signal.
+
+METHOD:: buffers
+The LocalBufs.
+
+METHOD:: frames
+Their length, a signal.
+
+METHOD:: phase
+The phasor, the same as writePhase.
+
+METHOD:: numChannels
+
+
+METHOD:: maxTime
+
+

@@ -1,0 +1,11 @@
+(
+	name: "FxKit",
+	summary: "an effect written as a table of its parameters: settings, presets, meters and a window from one list, on ParaEQ's FxUnit",
+	version: "0.1.0",
+	author: "Francesco Corvi",
+	url: "https://github.com/fracnesco/sc-fx-kit.git",
+	license: "MIT",
+	copyright: "Copyright (c) 2026 Francesco Corvi",
+	schelp: "HelpSource",
+	dependencies: ["https://github.com/fracnesco/sc-eq.git"]
+)

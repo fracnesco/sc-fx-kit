@@ -1,0 +1,15 @@
+Fuzz : FxParamUnit {
+	*controlName { ^\fuzz }
+	*params {
+		^[
+			this.knob(\drive, 0, 40, \lin, 12, "dB", "drive", "how hard it hits", section: \main),
+			this.menu(\curve, #[\soft, \hard], \soft, "curve", "which curve", \main),
+			this.mixParams(\main)
+		]
+	}
+	*presetList { ^[\default, (), \hot, (drive: 36, curve: \hard)] }
+	*process { |sig, p, ctx|
+		var g = p[\drive].dbamp;
+		^Select.ar(p[\curve], [(sig * g).tanh, (sig * g).clip2(1)])
+	}
+}

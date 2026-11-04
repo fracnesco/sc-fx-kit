@@ -1,0 +1,27 @@
+TITLE:: FxCubeWarp
+summary:: a bipolar knob, fine near the middle
+categories:: Libraries>FxKit
+related:: Classes/Warp, Classes/ControlSpec
+
+DESCRIPTION::
+For a ControlSpec from -hi to hi: small steps near 0, large at the ends. Spiral's shift is one.
+
+code::
+c = ControlSpec(-2000, 2000);
+c.warp = FxCubeWarp(c);
+c.map(0.55);
+c.map(1);
+::
+
+CLASSMETHODS::
+
+INSTANCEMETHODS::
+
+METHOD:: map
+
+ARGUMENT:: value
+
+METHOD:: unmap
+
+ARGUMENT:: value
+

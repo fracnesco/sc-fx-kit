@@ -1,0 +1,25 @@
+TITLE:: FxKit
+summary:: the small things more than one effect wants
+categories:: Libraries>FxKit
+related:: Classes/FxParamUnit
+
+DESCRIPTION::
+Stereo width, and the gain of a biquad in numbers.
+
+CLASSMETHODS::
+
+METHOD:: width
+Each channel moved from the middle of them all: 0 is mono, 1 as it came.
+ARGUMENT:: sig
+ARGUMENT:: amount
+
+METHOD:: biquadMag
+The gain of BLowPass (code::\lp::) or BHiPass (code::\hp::) at some frequencies, as ratios.
+ARGUMENT:: type
+ARGUMENT:: f0
+ARGUMENT:: rq
+ARGUMENT:: freqs
+ARGUMENT:: sr
+
+INSTANCEMETHODS::
+

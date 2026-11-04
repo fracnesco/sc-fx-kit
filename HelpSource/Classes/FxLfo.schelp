@@ -1,0 +1,30 @@
+TITLE:: FxLfo
+summary:: one low frequency oscillator, seven shapes
+categories:: Libraries>FxKit
+related:: Classes/FxParamUnit
+
+DESCRIPTION::
+Sine, triangle, saw up, saw down, square, sample and hold, noise, chosen by a control.
+
+code::
+{ SinOsc.ar(440 * (2 ** FxLfo.kr(1, 2))) * 0.1 ! 2 }.play;
+::
+
+CLASSMETHODS::
+
+METHOD:: shapes
+Their names.
+
+METHOD:: kr
+-1..1.
+ARGUMENT:: shape
+ARGUMENT:: rate
+ARGUMENT:: phase
+
+METHOD:: at
+The same in numbers, for a display. The two random ones draw as 0.
+ARGUMENT:: shape
+ARGUMENT:: ph
+
+INSTANCEMETHODS::
+

@@ -1,0 +1,58 @@
+TITLE:: FxParamView
+summary:: the base of an effect's display
+categories:: Libraries>FxKit
+related:: Classes/FxParamUnit, Classes/FxParamPanel, Classes/ParaEQSpectrum
+
+DESCRIPTION::
+One UserView that draws the effect and is usually a way of playing it too. A subclass writes code::prDraw::, using code::bw:: and code::bh:: for its size, and whichever of code::prMouseDown::, code::prMouseMove::, code::prMouseUp::, code::prWheel:: and code::hint:: it wants. The panel refreshes it on every change, and on every meter reply while it is on screen. One answering true to code::*wantsSpectrum:: can call code::prDrawSpectrum::.
+
+CLASSMETHODS::
+
+METHOD:: new
+
+ARGUMENT:: unit
+ARGUMENT:: parent
+
+METHOD:: minHeight
+
+
+METHOD:: wantsSpectrum
+
+
+METHOD:: freqToX
+A frequency's place on the log scale the spectrum is drawn on.
+ARGUMENT:: f
+ARGUMENT:: width
+ARGUMENT:: lo
+ARGUMENT:: hi
+
+METHOD:: xToFreq
+And back.
+ARGUMENT:: x
+ARGUMENT:: width
+ARGUMENT:: lo
+ARGUMENT:: hi
+
+INSTANCEMETHODS::
+
+METHOD:: view
+
+
+METHOD:: unit
+
+
+METHOD:: spectrum
+Its link::Classes/ParaEQSpectrum::, if it wants one.
+
+METHOD:: running
+
+
+METHOD:: refresh
+
+
+METHOD:: remove
+
+
+METHOD:: hint
+What the hint bar says over it.
+
