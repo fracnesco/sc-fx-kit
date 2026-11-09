@@ -180,8 +180,14 @@ FxParamPanel {
 			},
 			{
 				var spec = e[\spec];
+				// a double click puts it back to the table's default
 				var knob = Knob().fixedSize_(30@30).mode_(\vert)
-					.action_({ |k| unit !? (_.set(key, spec.map(k.value))) });
+					.action_({ |k| unit !? (_.set(key, spec.map(k.value))) })
+					.mouseDownAction_({ |v, x, y, mods, button, clickCount|
+						if (clickCount == 2 and: { (button ? 0) == 0 }) {
+							v.valueAction = spec.unmap(e[\default] ? spec.default); true
+						}
+					});
 				var box = NumberBox().fixedWidth_(48).align_(\center)
 					.decimals_(this.prDecimals(e))
 					.action_({ |b| unit !? (_.set(key, this.prFromBox(e, b.value))) });
