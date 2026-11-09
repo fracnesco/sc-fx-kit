@@ -59,6 +59,7 @@ FxParamUnit.allSubclasses;       // the effects built on it
 - A preset store per class and a clipboard per class.
 - Meters, while a window is open: `f.inLevel`, `f.outLevel`, and whatever `ctx[\extras]` carries in `f.extras`.
 - `FxParamPanel` and `FxParamGUI`: a row of knobs per section, and the hint on every one of them. `*displayClass` adds a view of your own, a subclass of `FxParamView`.
+- `FxDevicePanel` (with `*panelClass { ^FxDevicePanel }` and `*guiClass { ^FxDeviceGUI }`): the same table as a device - header, display and meters, cards on pages from `*devicePages`, dimmed controls from `*isActive`, the family's colour from `*identityColour`. Growl is the example.
 
 The table's order is the one thing to get right. It is what saved node maps carry, by position: append to it, never reorder.
 
@@ -73,6 +74,7 @@ A SynthDef can have one `LocalIn`, so two effects using it could not share a gra
 | file | what it is |
 |---|---|
 | [classes/FxParamUnit.sc](classes/FxParamUnit.sc) | the base class: the table, `*ar`, the object, presets, the clipboard |
+| [classes/FxDevicePanel.sc](classes/FxDevicePanel.sc) | `FxDevicePanel`, the device frame with the effect family's face (its window is `FxDeviceGUI`, in sc EQ) |
 | [classes/FxParamGUI.sc](classes/FxParamGUI.sc) | `FxParamPanel` and `FxParamGUI`, worked out from the table |
 | [classes/FxParamView.sc](classes/FxParamView.sc) | `FxParamView`, the base of a display, and `FxLevelBars` |
 | [classes/FxLoop.sc](classes/FxLoop.sc) | `FxLoop`, `FxLfo`, `FxKit`, `FxCubeWarp` |

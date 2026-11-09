@@ -1,0 +1,83 @@
+TITLE:: FxDevicePanel
+summary:: an FxParamUnit as a device: the shared frame with its family's face
+categories:: Libraries>FxKit
+related:: Classes/FxParamUnit, Classes/FxParamView, Classes/FxParamPanel, Classes/FxDeviceGUI, Classes/FxHeader
+
+DESCRIPTION::
+The window an effect gets when its class answers code::*panelClass { ^FxDevicePanel }:: (and code::*guiClass { ^FxDeviceGUI }::). Every effect shows the same frame: the header (power, name, presets, save, code::...::), the display with the in and out meters at its right, the controls in titled cards on one or more pages, the output card at the right of every page, and the hint bar. What the frame holds is the effect's family's: its display, its pages and cards (code::*devicePages::), what is dimmed (code::*isActive::), its colour (code::*identityColour::), and the size of each knob.
+
+The table becomes widgets this way:
+
+table::
+## strong::the table says:: || strong::the panel shows::
+## a knob || a knob: big, medium or small, its arc from the top if bipolar, its value with its unit underneath
+## a menu of 2 to 4 items || a row of lit segments, its label above
+## a menu with code::style: \knob:: || a knob stepping through the items, a tick each
+## a longer menu || a menu button
+## a toggle || one lit segment
+## a toggle with code::size: \big:: || a pad: a click latches it, held past a third of a second it is momentary
+::
+
+A card's keys may also hold Events that are not parameters:
+
+table::
+## code::(button: "go", size: \big, action: { |unit, panel| ... }, hint: "...")::  || a trigger pad (big) or a button
+## code::(choice: "chord", items: [...], prompt: "chord...", action: { |unit, item, index, panel| ... })::  || a menu that does something
+## code::(swap: [\leftDiv, \left], when: { |unit| unit.get(\sync) })::  || one slot, the first parameter while code::when:: is true
+::
+
+On every knob: drag up and down (shift: fine), the wheel, double click for its default, click its value to type one (code::2.5k::, code::350ms::, code::e2::), right click for a menu. Parameters a Tidal pattern plays are named in green while the effect listens.
+
+Growl is the worked example: its code::*devicePages::, code::*isActive:: and display show every part of this in use.
+
+code::
+g = Growl.new;
+g.gui;          // an FxDeviceGUI holding an FxDevicePanel
+g.free;
+::
+
+CLASSMETHODS::
+
+METHOD:: new
+ARGUMENT:: unit
+The effect, an link::Classes/FxParamUnit:: whose class answers code::*devicePages::.
+ARGUMENT:: parent
+A view to go in, or nil.
+
+INSTANCEMETHODS::
+
+METHOD:: view
+The panel's view: put it in a layout.
+
+METHOD:: unit
+The effect it shows.
+
+METHOD:: display
+Its display, an link::Classes/FxParamView::, or nil.
+
+METHOD:: meter
+Its in and out meters, an link::Classes/FxMeter::.
+
+METHOD:: header
+Its top line, an link::Classes/FxHeader::.
+
+METHOD:: widgets
+The widgets by parameter key.
+
+METHOD:: page
+Which page shows, from 0.
+
+METHOD:: focus
+Which instance a repeated card shows (Growl's stage), from 0; the display is told too.
+
+METHOD:: hints
+The link::Classes/FxHintBar:: every control describes itself in.
+
+METHOD:: running
+While true, the meters and the display run. Set it while the panel is on screen.
+
+METHOD:: refresh
+Shows the effect's settings again.
+
+METHOD:: remove
+Stops listening to the effect. Call it when the window closes; the effect is not freed.
