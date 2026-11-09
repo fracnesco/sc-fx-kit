@@ -56,8 +56,21 @@ What SuperDirtGUI calls this kind of insert.
 METHOD:: insertLabel
 What its button says.
 
+METHOD:: tidalParams
+The keys SuperDirtGUI lets a Tidal pattern set event by event, when its insert listens. Its knobs but code::output::, unless the effect says which: leave out what reallocates, clicks or means nothing in steps.
+
+METHOD:: renamed
+Parameters a subclass renamed, as an Event old -> new. code::set::, code::get::, the properties, code::settings_:: and code::fullSettings:: given an old name reach the new one, so old presets and sessions still load.
+
+METHOD:: currentKey
+A parameter's name now, said by its old name or its new.
+ARGUMENT:: key
+
+METHOD:: usesTidalClock
+Whether its graph reads FxLfo's cycle clock: SuperDirtGUI then tells it Tidal's cps and cycle. False unless the effect says so.
+
 METHOD:: knob
-A table entry. box says what the number box shows: code::\ms::, code::\pct:: or nil. lag is the control's smoothing, 0.05 unless said. section is the row it goes in; nil has no widget.
+A table entry. box says how the value reads: code::\ms::, code::\pct::, code::\note:: (a Tidal note name, 60 is c5) or nil. lag is the control's smoothing, 0.05 unless said. section is the card it goes in; nil has no widget. The last three are for the device panel's knob and are ignored by link::Classes/FxParamPanel::. Any other key can be put on the entry afterwards: code::menuItems:: (pairs of label and value for the knob's right click menu).
 ARGUMENT:: key
 ARGUMENT:: lo
 ARGUMENT:: hi
@@ -132,6 +145,15 @@ METHOD:: hasClipboard
 Whether something has been copied, of this class.
 
 INSTANCEMETHODS::
+
+METHOD:: tidal
+Something that plays it from Tidal - SuperDirtGUI's insert - or nil. It answers code::listening::, code::listening_::, code::tidalName:: and code::tidalKeys::, and says code::changed(\tidal):: on the unit when they change. With one, the window shows a listen switch and, while it listens, each parameter Tidal can set labelled in green by its key.
+
+METHOD:: isListening
+Whether link::#-tidal:: is listening now.
+
+METHOD:: tidalKeys
+The keys a pattern sets while it listens, else an empty Array.
 
 METHOD:: set
 Set a parameter by name. A knob clips to its range.

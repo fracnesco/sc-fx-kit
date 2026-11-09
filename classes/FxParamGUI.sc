@@ -22,8 +22,9 @@
 
 FxParamPanel {
 	var <unit, <cls, <view, <display, <bars;
-	var onBox, presetMenu, nameField, saveBtn, delBtn, copyBtn, pasteBtn;
+	var onBox, tidalBox, presetMenu, nameField, saveBtn, delBtn, copyBtn, pasteBtn;
 	var widgets, sectionLabels, ctrl, classCtrl, hints, running = false;
+	var tidalShown;			// what the labels show now: [name, keys], so a refresh at 10 Hz changes nothing
 
 	*new { |unit, parent| ^super.new.init(unit, parent) }
 
@@ -52,6 +53,7 @@ FxParamPanel {
 			.put(\levels, { { display !? (_.refresh); bars.refresh }.defer })
 			.put(\enabled, { { this.refresh }.defer })
 			.put(\settings, { { this.refresh }.defer })
+			.put(\tidal, { { this.refresh }.defer })
 			.put(\freed, { { this.prUnitGone }.defer });
 		cls.paramNames.do { |key|
 			ctrl.put(key, { { this.prRefreshOne(key); this.prRefreshPreset; display !? (_.refresh) }.defer });
@@ -90,6 +92,7 @@ FxParamPanel {
 		hints = bar;
 		if (bar.isNil) { ^this };
 		bar.attach(onBox, "switch it on - off, it costs nothing, or the tail rings out and then nothing");
+		bar.attach(tidalBox, "while this is on, a Tidal pattern sets the parameters shown in green by those names: s \"name\" # key value");
 		bar.attach(presetMenu,
 			"ready made settings, then any you have saved - reads (custom) once you move something");
 		bar.attach(nameField, "a name to keep the current settings under");
@@ -112,6 +115,9 @@ FxParamPanel {
 	prTopRow {
 		onBox = CheckBox().string_(cls.title ++ " on")
 			.action_({ |v| unit !? (_.enabled_(v.value)) });
+		// only when something plays it from Tidal (unit.tidal)
+		tidalBox = CheckBox().string_("listen to tidal").visible_(false)
+			.action_({ |v| unit !? { |u| u.tidal !? { |t| t.listening = v.value } } });
 		presetMenu = PopUpMenu().fixedWidth_(120)
 			.items_(cls.presetNames.collect(_.asString) ++ ["(custom)"])
 			.action_({ |v|
@@ -128,7 +134,7 @@ FxParamPanel {
 		copyBtn = FxPalette.button("copy", 44, { unit !? (_.copySettings) });
 		pasteBtn = FxPalette.button("paste", 46, { unit !? (_.pasteSettings) });
 		^HLayout(*[
-			onBox,
+			onBox, tidalBox,
 			FxPalette.label("preset", 40), presetMenu,
 			nameField, saveBtn, delBtn,
 			copyBtn, pasteBtn,
@@ -163,13 +169,13 @@ FxParamPanel {
 				var menu = PopUpMenu().fixedWidth_(this.prMenuWidth(e))
 					.items_(e[\items].collect(_.asString))
 					.action_({ |v| unit !? (_.set(key, e[\items][v.value ? 0])) });
-				widgets[key] = (views: [label, menu], menu: menu);
+				widgets[key] = (views: [label, menu], menu: menu, label: label);
 				VLayout(label, menu, nil).spacing_(1).margins_(0)
 			},
 			\toggle, {
 				var box = CheckBox().string_(e[\label])
 					.action_({ |v| unit !? (_.set(key, v.value)) });
-				widgets[key] = (views: [box], check: box);
+				widgets[key] = (views: [box], check: box, checkLabel: e[\label]);
 				VLayout(nil, box, nil).spacing_(1).margins_(0)
 			},
 			{
@@ -179,7 +185,7 @@ FxParamPanel {
 				var box = NumberBox().fixedWidth_(48).align_(\center)
 					.decimals_(this.prDecimals(e))
 					.action_({ |b| unit !? (_.set(key, this.prFromBox(e, b.value))) });
-				widgets[key] = (views: [label, knob, box], knob: knob, box: box);
+				widgets[key] = (views: [label, knob, box], knob: knob, box: box, label: label);
 				VLayout(label, [knob, align: \center], box).spacing_(1).margins_(0)
 			}
 		)
@@ -219,12 +225,42 @@ FxParamPanel {
 		if (view.isNil or: { view.isClosed }) { ^this };
 		this.prRefreshPreset;
 		pasteBtn.enabled = cls.hasClipboard;
-		if (unit.isNil) { onBox.value = false; ^this };
+		if (unit.isNil) { onBox.value = false; tidalBox.visible = false; ^this };
 		onBox.value = unit.enabled;
+		this.prRefreshTidal;
 		cls.paramNames.do { |key| this.prRefreshOne(key) };
 		display !? (_.refresh);
 		bars.refresh;
 	}
+
+	// the listen switch, and every parameter a pattern sets named by its Tidal
+	// key, in green, while it listens - the key is what follows the effect's
+	// name in # fx "growl" "drive1"; the others as the table labels them
+	prRefreshTidal {
+		var t = unit !? { unit.tryPerform(\tidal) }, on = false, keys = [];
+		tidalBox.visible = t.notNil;
+		if (t.notNil) {
+			on = t.listening == true;
+			keys = if (on) { t.tidalKeys ? [] } { [] };
+			tidalBox.value = on;
+			tidalBox.string = "listen to tidal as " ++ t.tidalName;
+		};
+		if (tidalShown == [t !? { t.tidalName }, keys]) { ^this };
+		tidalShown = [t !? { t.tidalName }, keys];
+		cls.table.do { |e|
+			var w = widgets[e[\key]], tidal = keys.includes(e[\key]);
+			w !? {
+				w[\label] !? { |l|
+					l.string = if (tidal) { e[\key].asString } { e[\label] };
+					l.stringColor = if (tidal) { this.class.tidalColour } { FxPalette.dim };
+				};
+				w[\check] !? { |c| c.string = if (tidal) { e[\key].asString } { w[\checkLabel] } };
+			}
+		}
+	}
+
+	// what a parameter's name is drawn in while Tidal plays it
+	*tidalColour { ^Color(0.55, 0.85, 0.55) }
 
 	prRefreshOne { |key|
 		var e = cls.param(key), w = widgets[key], v;

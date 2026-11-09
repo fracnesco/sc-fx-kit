@@ -57,6 +57,7 @@ FxParamUnit : FxUnit {
 	var <values;						// key -> what the setter was given, constrained
 	var <id, responder, meterOn = false;
 	var <inLevel = 0, <outLevel = 0, <extras, <lastReply = 0;
+	var <tidal;							// who plays it from Tidal (SuperDirtGUI's insert), or nil
 
 	*initClass {
 		tables = IdentityDictionary.new;
@@ -102,6 +103,25 @@ FxParamUnit : FxUnit {
 	// what SuperDirtGUI's insert menu calls it, and its kind there
 	*insertKind { ^this.name.asString.toLower.asSymbol }
 	*insertLabel { ^this.name.asString }
+
+	// the parameters SuperDirtGUI lets a Tidal pattern move, event by event: the
+	// knobs but the output level unless a subclass says which. Leave out what
+	// reallocates, clicks or makes no sense in steps
+	*tidalParams {
+		^this.table.select { |e| e[\kind] == \knob and: { e[\section].notNil } and: { e[\key] != \output } }
+			.collect { |e| e[\key] }
+	}
+
+	// parameters a subclass renamed, old -> new: set, get, the properties and
+	// settings (presets, sessions) given the old name reach the new one
+	*renamed { ^() }
+
+	// the parameter's name now, said by its old name or its new
+	*currentKey { |key| key = key.asSymbol; ^this.renamed[key] ? key }
+
+	// whether its graph has the cycle clock (FxLfo's sync): SuperDirtGUI then
+	// tells it Tidal's tempo and cycle
+	*usesTidalClock { ^false }
 
 	// ---------------------------------------------------------- table entries
 
@@ -276,7 +296,7 @@ FxParamUnit : FxUnit {
 	}
 
 	set { |key, value|
-		var e = this.class.param(key), v;
+		var e = this.class.param(this.class.currentKey(key)), v;
 		if (e.isNil) {
 			("%: no parameter called %".format(this.class.name, key.asCompileString)).warn;
 			^this
@@ -291,11 +311,26 @@ FxParamUnit : FxUnit {
 		this.prChanged(e[\key]);
 	}
 
-	get { |key| ^values[key.asSymbol] }
+	get { |key| ^values[this.class.currentKey(key)] }
+
+	// Something that plays it from Tidal - SuperDirtGUI's insert - answering
+	// listening, listening_, tidalName and tidalKeys; the panel then shows a
+	// listen switch and, while it listens, each parameter by its Tidal key.
+	// It says changed(\tidal) on the unit when any of that changes.
+	tidal_ { |obj|
+		tidal = obj;
+		this.changed(\tidal);
+	}
+
+	// whether it is played from Tidal now
+	isListening { ^tidal !? { |t| t.listening == true } ? false }
+
+	// the keys a pattern sets while it listens
+	tidalKeys { ^if (this.isListening) { tidal.tidalKeys } { [] } }
 
 	// a parameter is a property: unit.drive, unit.drive = 3
 	doesNotUnderstand { |selector ...args|
-		var key = selector.asGetter;
+		var key = this.class.currentKey(selector.asGetter);
 		if (values.notNil and: { values.includesKey(key) }) {
 			if (selector.isSetter) { this.set(key, args[0]); ^this };
 			^values[key]
@@ -407,7 +442,8 @@ FxParamUnit : FxUnit {
 	*fullSettings { |few|
 		var d = ();
 		this.table.do { |e|
-			d[e[\key]] = this.prConstrain(e, few !? { few[e[\key]] } ? e[\default]);
+			var old = this.renamed.findKeyForValue(e[\key]);
+			d[e[\key]] = this.prConstrain(e, few !? { few[e[\key]] ?? { old !? { few[old] } } } ? e[\default]);
 		};
 		^d
 	}
@@ -416,6 +452,10 @@ FxParamUnit : FxUnit {
 	// a preset saved before a parameter existed still loads
 	settings_ { |d|
 		if (d.isNil) { ^this };
+		// said by old names: under the new ones, unless the new is said too
+		this.class.renamed.keysValuesDo { |old, new|
+			if (d[old].notNil and: { d[new].isNil }) { d = d.copy; d[new] = d[old] }
+		};
 		this.class.table.do { |e|
 			d[e[\key]] !? { |v|
 				this.class.prConstrain(e, v) !? { |c| values[e[\key]] = c };
