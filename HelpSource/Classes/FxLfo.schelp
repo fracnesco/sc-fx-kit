@@ -10,6 +10,22 @@ code::
 { SinOsc.ar(440 * (2 ** FxLfo.kr(1, 2))) * 0.1 ! 2 }.play;
 ::
 
+subsection:: On a cycle clock
+With a fourth argument, the index of one of link::#*syncNames::, the lfo can run
+on a clock instead of its rate: one period every so many cycles. The clock is
+three controls that every effect in one graph shares: code::fxCps:: (cycles a
+second, 0.5625 unless told), code::fxCycle:: (where the clock was when told) and
+code::fxSync:: (a trigger sent with fxCycle). From the trigger the position runs
+on at fxCps, so a clock told now and then keeps the phase. SuperDirtGUI tells it
+from Tidal's events (SDGFxControl). Without the fourth argument the graph has no
+clock controls and nothing changes.
+
+code::
+x = { SinOsc.ar(440 * (2 ** FxLfo.kr(4, 1, 0, \sync.kr(5)))) * 0.1 ! 2 }.play;  // a square on 1/4 cycle
+x.set(\fxCps, 0.5, \fxCycle, 0, \fxSync, 1);   // 0.5 cycles a second, the cycle starts now
+x.free;
+::
+
 CLASSMETHODS::
 
 METHOD:: shapes
@@ -20,6 +36,17 @@ METHOD:: kr
 ARGUMENT:: shape
 ARGUMENT:: rate
 ARGUMENT:: phase
+ARGUMENT:: sync
+an index into link::#*syncNames::, a number or a control; 0 is free. Leave it out for no clock.
+
+METHOD:: syncNames
+code::free::, then a period in cycles, as words so a Tidal pattern can say them: four, two, one, half, quarter, eighth, sixteenth, third, sixth, twelfth (4 to 1/12 of a cycle). For a menu in a table.
+
+METHOD:: syncCycles
+The periods in cycles, by the same index.
+
+METHOD:: clock
+Inside a SynthDef function: code::[cps, position]::, the clock's speed and where it is in cycles.
 
 METHOD:: at
 The same in numbers, for a display. The two random ones draw as 0.
