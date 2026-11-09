@@ -1,7 +1,7 @@
 TITLE:: FxParamUnit
 summary:: an effect written as a table of its parameters
 categories:: Libraries>FxKit
-related:: Classes/FxUnit, Classes/FxParamPanel, Classes/FxParamView, Classes/FxLoop
+related:: Classes/FxUnit, Classes/FxDevicePanel, Classes/FxParamPanel, Classes/FxParamView, Classes/FxLoop
 
 DESCRIPTION::
 A link::Classes/FxUnit:: whose settings, presets, clipboard, meters and window are worked out from one list. A subclass writes code::*params:: and code::*process::, and usually code::*presetList:: and code::*displayClass::. It runs in a graph, on a bus, or in an link::Classes/FxChain::; if SuperDirtGUI is installed it is an insert too.
@@ -47,6 +47,19 @@ ARGUMENT:: panel
 METHOD:: windowSize
 Subclass: a Point.
 
+METHOD:: devicePages
+Subclass, for an effect whose window is a link::Classes/FxDevicePanel::: the pages of controls, each a name -> the cards on it, left to right. A card is a section's name (its parameters in table order) or an Event code::(title:, keys:, colour:)::, where a key in code::keys:: may be an Array (a column: two menus stacked) or an Event that is not a parameter (a pad, a menu that acts, a slot that swaps two parameters - see link::Classes/FxDevicePanel::). With code::count: n::, code::keys:: and code::colour:: are functions of the index and the card gets a selector, as Growl's three stages do. The section code::\output:: is never on a page: it is the card at the right of every page. By default one page of every section.
+
+METHOD:: isActive
+Subclass: whether a parameter does anything with the others as they are now. The device panel dims what answers false - Growl's crossovers outside multiband, a filter's frequency while it is off. True unless the effect says otherwise.
+ARGUMENT:: key
+The parameter.
+ARGUMENT:: unit
+The object, to read the others from.
+
+METHOD:: identityColour
+Subclass: the effect family's colour, a link::Classes/Color:: from code::FxPalette.identity:: (code::\reverb::, code::\delay::, code::\spectral::...), or nil for none. The device panel draws the name, the hero knobs' arcs and a card coloured code::\identity:: in it, and the display uses it for what the effect itself adds.
+
 METHOD:: title
 What a window calls it.
 
@@ -84,9 +97,15 @@ ARGUMENT:: lag
 ARGUMENT:: section
 ARGUMENT:: dec
 ARGUMENT:: step
+ARGUMENT:: size
+code::\big::, code::\medium:: (when nil) or code::\small::: the one to three that define the effect are big.
+ARGUMENT:: bipolar
+Whether the arc starts at the top: worked out as true for a range like -1 .. 1 or -24 .. 24; say false for one that only looks symmetric.
+ARGUMENT:: floorText
+What the bottom of the range reads when it means off, as code::"off"::.
 
 METHOD:: menu
-A table entry.
+A table entry. In the device panel, a menu of two to four items is a row of lit segments; put code::style: \knob:: on the entry for a knob that steps through the items (note values), or code::style: \menu:: to keep a menu.
 ARGUMENT:: key
 ARGUMENT:: items
 ARGUMENT:: default
@@ -95,7 +114,7 @@ ARGUMENT:: hint
 ARGUMENT:: section
 
 METHOD:: toggle
-A table entry.
+A table entry. In the device panel it is one lit segment; put code::size: \big:: on the entry for a pad - a click latches it, holding it past a third of a second makes it momentary (freeze while held).
 ARGUMENT:: key
 ARGUMENT:: default
 ARGUMENT:: label

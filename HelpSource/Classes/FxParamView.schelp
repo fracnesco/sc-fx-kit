@@ -54,5 +54,12 @@ METHOD:: remove
 
 
 METHOD:: hint
-What the hint bar says over it.
+What the hint bar says over it. The hint bar passes the pointer, so a display can name what is under it.
+ARGUMENT:: x
+The pointer's x in the view, or nil.
+ARGUMENT:: y
+The pointer's y in the view, or nil.
+
+METHOD:: levelsArrived
+Called on every meter reply, before the refresh: a display that draws a live trace (a reverb ringing out) records code::unit.outLevel:: here. Does nothing unless a subclass says.
 

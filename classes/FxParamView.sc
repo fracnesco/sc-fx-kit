@@ -77,7 +77,13 @@ FxParamView {
 		bh = b.height.max(1);
 	}
 
-	hint { ^"" }
+	// what the hint bar says over the display; x and y are the pointer's, in
+	// the view, so a display can name what is under it (nil when not known)
+	hint { |x, y| ^"" }
+
+	// called on every meter reply, before the refresh: a display that draws a
+	// live trace (a reverb's ringing out) records unit.outLevel here
+	levelsArrived { }
 
 	prDraw { }
 	prMouseDown { |x, y, mod, count| }

@@ -97,6 +97,23 @@ FxParamUnit : FxUnit {
 	// where the window opens, and how big
 	*windowSize { ^Point(860, 150 + (this.sections.size * 76) + if (this.displayClass.notNil) { 210 } { 0 }) }
 
+	// FxDevicePanel (sc-fx-ui): the pages of controls, each a name -> the cards on
+	// it, left to right. A card is a section's name (its parameters in table
+	// order), or an Event: (title:, keys: [key, [key, key] stacked, ...], colour:),
+	// and with count: n, keys and colour are functions of 0..n-1 and the card
+	// gets a selector (Growl's three stages). The section \output is not on a
+	// page: it is the card at the right of every page.
+	*devicePages { ^[\main -> this.sections.reject { |s| s == \output }] }
+
+	// whether a parameter does anything with the others as they are: the panel
+	// dims it when not (Growl's crossovers outside multiband)
+	*isActive { |key, unit| ^true }
+
+	// the family's colour (FxPalette.identity(\hall)): the name, the hero knobs'
+	// arcs, a card's colour: \identity, and what the display draws as the effect's
+	// own contribution - nil for none (sc-fx-ui, "Family faces")
+	*identityColour { ^nil }
+
 	// what a window calls it
 	*title { ^this.name.asString.toLower }
 
@@ -129,10 +146,15 @@ FxParamUnit : FxUnit {
 	// milliseconds, \pct for 0..1 as percent, nil for the value as it is.
 	// lag is the control's smoothing: 0.05 unless said; 0 for things that move
 	// in steps. section is the row it goes in; hidden ones (nil) have no widget.
-	*knob { |key, lo, hi, warp, default, units, label, hint, box, lag, section = \main, dec, step = 0|
+	// size (\big, \medium, \small), bipolar (the arc from the top; said by itself
+	// for a range like -1..1) and floorText (what the bottom says when it means
+	// off) are for FxDevicePanel's knobs (sc-fx-ui); the old panel ignores them
+	*knob { |key, lo, hi, warp, default, units, label, hint, box, lag, section = \main, dec, step = 0,
+		size, bipolar, floorText|
 		^(kind: \knob, key: key, spec: ControlSpec(lo, hi, warp ? \lin, step, default, units ? ""),
 			default: default, label: label ? key.asString, hint: hint ? "",
-			box: box, lag: lag ? 0.05, section: section, dec: dec)
+			box: box, lag: lag ? 0.05, section: section, dec: dec,
+			size: size, bipolar: bipolar ?? { lo == hi.neg }, floorText: floorText)
 	}
 
 	*menu { |key, items, default, label, hint, section = \main|
