@@ -246,7 +246,7 @@ FxDevicePanel {
 			{
 				var size = e[\size] ? \medium;
 				var k = FxKnob(e[\label], e[\spec], size, e[\bipolar] ? false,
-					colour ?? { if (size == \big) { this.identity } });
+					cls.tryPerform(\keyColour, key) ?? colour ?? { if (size == \big) { this.identity } });
 				k.default = e[\default] ? e[\spec].default;
 				k.box = e[\box];
 				k.dec = e[\dec];

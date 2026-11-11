@@ -114,6 +114,11 @@ FxParamUnit : FxUnit {
 	// own contribution - nil for none (sc-fx-ui, "Family faces")
 	*identityColour { ^nil }
 
+	// a parameter's own colour in the device panel, over its card's: a knob
+	// that links to something of that colour in the display (Imager's bands).
+	// nil for the card's
+	*keyColour { |key| ^nil }
+
 	// what a window calls it
 	*title { ^this.name.asString.toLower }
 

@@ -69,6 +69,11 @@ What SuperDirtGUI calls this kind of insert.
 METHOD:: insertLabel
 What its button says.
 
+METHOD:: keyColour
+Subclass: a parameter's own colour in the device panel, over its card's - for a knob that links to something of that colour in the display (Imager's width knobs wear their bands' colours). nil, the card's colour, unless the effect says otherwise.
+ARGUMENT:: key
+The parameter.
+
 METHOD:: tidalParams
 The keys SuperDirtGUI lets a Tidal pattern set event by event, when its insert listens. Its knobs but code::output::, unless the effect says which: leave out what reallocates, clicks or means nothing in steps.
 
