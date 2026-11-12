@@ -444,7 +444,9 @@ FxParamUnit : FxUnit {
 			extras = msg.drop(5);
 			lastReply = Main.elapsedTime;
 			this.changed(\levels);
-		}, FxParamUnit.replyName, srv.addr, argTemplate: [nil, id]);
+		}, FxParamUnit.replyName, srv.addr, argTemplate: [nil, id]).fix;
+		// fixed: a cmd-period must not take it while meterOn stays true, since
+		// a node remade with the same id (a SuperDirt rebuild) reports again
 	}
 
 	prUnlisten {

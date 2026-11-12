@@ -111,7 +111,7 @@ FxLfo {
 			ph = (ph + phase).wrap(0, 1);
 			rate = Select.kr(isSync, [rate, cps / cycles]);
 		};
-		wrapped = ph < Delay1.kr(ph);
+		wrapped = this.wrapTrig(ph, rate);
 		^Select.kr(shape, [
 			(ph * 2pi).sin,
 			1 - (4 * (ph - 0.5).abs),
@@ -121,6 +121,19 @@ FxLfo {
 			Latch.kr(WhiteNoise.kr, wrapped + Impulse.kr(0)),
 			LFNoise2.kr(rate.max(0.01))
 		])
+	}
+
+	// 1 for the block where a 0..1 phase wraps forward (0.995 -> 0.002), else 0.
+	// One-sided: a synced cycle told again steps back a little (0.40 -> 0.38),
+	// or back across zero (0.002 -> 0.998); neither is a wrap. And held off: a
+	// wrap within a quarter period (rate in Hz) of the last one is the same wrap
+	// again, after a late re-send stepped back across zero. Timer, not LocalIn,
+	// so a graph may hold several lfos; it measures from the last raw wrap,
+	// from the start for the first, which is always taken
+	*wrapTrig { |ph, rate = 1|
+		var raw = ph < (Delay1.kr(ph) - 0.5);
+		var hold = (0.25 / rate.abs.max(0.001)).max(ControlDur.ir);
+		^raw * ((Timer.kr(raw) > hold) + (PulseCount.kr(raw) <= 1)).min(1)
 	}
 
 	*at { |shape, ph|
