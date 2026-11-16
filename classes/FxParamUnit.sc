@@ -340,6 +340,31 @@ FxParamUnit : FxUnit {
 
 	get { |key| ^values[this.class.currentKey(key)] }
 
+	// The table as FxUnit's *mapParams: every parameter with a widget. A menu
+	// is its item's index and a toggle 0 or 1, so each has a spec of numbers;
+	// the big knobs, mix and output are the heroes.
+	*prMapParams {
+		^this.table.select { |e| e[\section].notNil }.collect { |e|
+			var spec = switch (e[\kind],
+				\menu, { ControlSpec(0, (e[\items].size - 1).max(1), \lin, 1, e[\items].indexOf(e[\default]) ? 0) },
+				\toggle, { ControlSpec(0, 1, \lin, 1, e[\default].binaryValue) },
+				{ e[\spec] }
+			);
+			(key: e[\key], label: e[\label], kind: e[\kind], spec: spec, items: e[\items],
+				section: e[\section], box: e[\box],
+				hero: (e[\size] == \big) or: { #[\mix, \output].includes(e[\key]) })
+		}
+	}
+
+	mapGet { |key|
+		var e = this.class.param(this.class.currentKey(key));
+		^e !? { this.class.prToControl(e, values[e[\key]]) }
+	}
+
+	mapSet { |key, value|
+		if (this.class.param(this.class.currentKey(key)).notNil) { this.set(key, value) };
+	}
+
 	// Something that plays it from Tidal - SuperDirtGUI's insert - answering
 	// listening, listening_, tidalName and tidalKeys; the panel then shows a
 	// listen switch and, while it listens, each parameter by its Tidal key.
