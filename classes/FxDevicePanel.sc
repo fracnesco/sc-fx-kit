@@ -258,6 +258,9 @@ FxDevicePanel {
 			}
 		);
 		widgets[key] = w;
+		// which parameter it is, for a controller mapper or a macro (FxMapHooks)
+		w.mapUnitFunc = { unit };
+		w.mapKey = key;
 		^if ((e[\kind] == \toggle) and: { e[\size] != \big }) {
 			VLayout(View().fixedHeight_(16), w.view, nil).margins_(0).spacing_(0)
 		} { w.view }
