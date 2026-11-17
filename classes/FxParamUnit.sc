@@ -153,13 +153,15 @@ FxParamUnit : FxUnit {
 	// in steps. section is the row it goes in; hidden ones (nil) have no widget.
 	// size (\big, \medium, \small), bipolar (the arc from the top; said by itself
 	// for a range like -1..1) and floorText (what the bottom says when it means
-	// off) are for FxDevicePanel's knobs (sc-fx-ui); the old panel ignores them
+	// off) are for FxDevicePanel's knobs (sc-fx-ui); the old panel ignores them.
+	// interval is what an arrow key moves it by (FxPalette.nudge); left nil it
+	// is worked out from the range and the unit
 	*knob { |key, lo, hi, warp, default, units, label, hint, box, lag, section = \main, dec, step = 0,
-		size, bipolar, floorText|
+		size, bipolar, floorText, interval|
 		^(kind: \knob, key: key, spec: ControlSpec(lo, hi, warp ? \lin, step, default, units ? ""),
 			default: default, label: label ? key.asString, hint: hint ? "",
 			box: box, lag: lag ? 0.05, section: section, dec: dec,
-			size: size, bipolar: bipolar ?? { lo == hi.neg }, floorText: floorText)
+			size: size, bipolar: bipolar ?? { lo == hi.neg }, floorText: floorText, interval: interval)
 	}
 
 	*menu { |key, items, default, label, hint, section = \main|
@@ -351,7 +353,7 @@ FxParamUnit : FxUnit {
 				{ e[\spec] }
 			);
 			(key: e[\key], label: e[\label], kind: e[\kind], spec: spec, items: e[\items],
-				section: e[\section], box: e[\box],
+				section: e[\section], box: e[\box], interval: e[\interval],
 				hero: (e[\size] == \big) or: { #[\mix, \output].includes(e[\key]) })
 		}
 	}

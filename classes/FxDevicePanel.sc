@@ -250,6 +250,7 @@ FxDevicePanel {
 				k.default = e[\default] ? e[\spec].default;
 				k.box = e[\box];
 				k.dec = e[\dec];
+				k.interval = e[\interval];
 				k.floorText = e[\floorText];
 				k.hint = e[\hint] ? "";
 				k.menuItems = e[\menuItems];
