@@ -1,0 +1,59 @@
+TITLE:: FxRackBranch
+summary:: one chain of a rack: its effects, level, mute, solo and place in the line-up
+categories:: Libraries>ParaEQ
+related:: Classes/FxRack, Classes/FxChain
+
+DESCRIPTION::
+One of the chains an link::Classes/FxRack:: runs side by side. Made by
+link::Classes/FxRack#-addBranch::, never by hand.
+
+code::
+(
+r = FxRack();
+b = r.addBranch("dry");
+b.level = -6;
+b.chain.add(ParaEQ());
+r.branches.collect(_.name);
+);
+::
+
+INSTANCEMETHODS::
+
+METHOD:: rack
+The link::Classes/FxRack:: it belongs to.
+
+METHOD:: chain
+Its effects: an owned link::Classes/FxChain::. Add to it, take out of it and
+reorder it as any chain; the rack places its group and rebuilds it.
+
+METHOD:: name
+What the chain is called.
+
+METHOD:: level
+In dB, -60 to +6. -60 is silence. Default 0.
+
+METHOD:: mute
+Set true to silence the chain.
+
+METHOD:: solo
+Set true and only the soloed chains of the rack are heard.
+
+METHOD:: align
+Whether the chain takes part in the line-up. Off, it is not held back and the
+others do not wait for it. Default true.
+
+METHOD:: latency
+How late the chain is by itself, in seconds: the latencies of the effects that
+are on in it, added up.
+
+METHOD:: heldBack
+How long the rack holds the chain back so the others catch up, in seconds.
+
+METHOD:: delay
+The same in samples.
+
+METHOD:: summary
+What the chain is made of, as a line: "compressor → eq", or "-" when empty.
+
+METHOD:: index
+Its place among the rack's chains.

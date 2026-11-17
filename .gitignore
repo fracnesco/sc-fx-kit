@@ -1,5 +1,12 @@
 .DS_Store
 
+# chain presets are yours, not the repository's
+presets/*
+!presets/.gitkeep
+
 # local working notes, not for the repository
 ECOSYSTEM.md
 CLAUDE.md
+
+# UI snapshots and mock-ups, made while working on the windows
+ui-shots/

@@ -1,0 +1,57 @@
+TITLE:: FxHintBar
+summary:: a strip that says what the mouse is over
+categories:: Libraries>ParaEQ
+related:: Classes/ParaEQGUI, Classes/CompressorGUI, Classes/FxChainGUI, Classes/ModuleHintBar
+
+DESCRIPTION::
+A line along the bottom of a window that describes whatever control the pointer
+is on, so a window full of small boxes can be read without a manual. The same
+idea as link::Classes/ModuleHintBar:: in the module family, written here so this
+repository depends on nothing.
+
+code::
+hints = FxHintBar();
+hints.watch(window);                    // once, after the window exists
+window.layout = VLayout(..., hints.view);
+
+hints.attach(box, "what this box does");
+hints.attach([label, slider, box], "the three parts of one control");
+hints.attach(readout, { "now at " ++ thing.value });   // worked out on hover
+::
+
+link::#-attach:: answers what it was given, so a control can be wrapped where it
+is built. A hint is a String, or a Function answering one.
+
+CLASSMETHODS::
+
+METHOD:: new
+ARGUMENT:: defaultString
+What the bar says when the pointer is on nothing in particular.
+ARGUMENT:: height
+In pixels; link::#*defaultHeight:: if left out.
+
+METHOD:: defaultHeight
+22.
+
+INSTANCEMETHODS::
+
+METHOD:: view
+The strip, to put in a layout.
+
+METHOD:: watch
+Let a window pass its children's mouse-overs down, and reset the bar when the
+pointer is over the window itself.
+
+METHOD:: attach
+Give one or more views a hint. Answers code::views::.
+
+METHOD:: string
+What the bar says now; nil puts back the default.
+
+METHOD:: clear
+METHOD:: defaultString
+METHOD:: visible
+
+METHOD:: toggle
+A checkbox that folds the bar away, made on the first ask. It has to sit outside
+the bar, or folding it would take the way back with it.

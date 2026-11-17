@@ -1,0 +1,174 @@
+TITLE:: FxUnit
+summary:: what an effect is, whichever graph it ends up in
+categories:: Libraries>ParaEQ
+related:: Classes/ParaEQ, Classes/Compressor, Classes/FxChain, Classes/FxPresetStore, Classes/NodeProxy
+
+DESCRIPTION::
+The base of link::Classes/ParaEQ:: and link::Classes/Compressor::. An effect
+here is two things that agree with each other: a piece of DSP written as a
+pseudo-UGen that reads named controls, and an object that holds the settings and
+pushes them at whatever node is running that DSP. The same DSP runs in three
+places and the same object drives all three:
+
+code::
+// in a graph of your own, as a UGen; the object drives that graph's control
+Ndef(\pad, { var sig = Saw.ar(110); ParaEQ.ar(sig, \eq) ! 2 });
+e = ParaEQ(Ndef(\pad), \eq);
+
+// on a bus, in place, with a node of its own
+e = ParaEQ.onBus(16, 2);
+e.enabled = true;
+
+// in a chain of effects on a bus
+FxChain.master.units[0];
+::
+
+subsection:: What enabled means
+
+The same thing in every mode. With a node of its own, the node exists exactly
+while the effect is on - built when it is switched on, faded out when it is
+switched off, so off costs nothing. Driving a graph, a control called
+code::name:: + code::On:: is set and the DSP crossfades to dry; the graph does
+not know. In a chain, the chain places and drops the node - see
+link::Classes/FxChain::.
+
+subsection:: Driving a node
+
+Anything that answers to code::set:: will do: an Ndef or any
+link::Classes/NodeProxy::, a link::Classes/Synth::, a link::Classes/Group::.
+Settings travel as one array on one control, so a push is atomic. A NodeProxy
+keeps what it was set in its nodeMap, so a second object made for the same
+proxy adopts the settings it already carries rather than resetting them, and a
+rebuilt proxy comes back with them. With no target at all the object only holds
+settings - the compressor keeps its sidechain eq that way and pushes it through
+its own node.
+
+subsection:: What a subclass provides
+
+table::
+## code::*ar:: || the DSP, reading link::Classes/NamedControl::s off a name
+## code::*defName::, code::*synthDef:: || the in place synth for a channel count: In - *ar - XOut
+## code::*controlName:: || the control read when none is named
+## code::controls:: || the flat array the node is given
+## code::settings::, code::settings_:: || what a preset and the clipboard hold
+## code::asDict::, code::fromDict:: || what a set, a kit or a chain preset writes, enabled and all
+## code::*guiClass::, code::*panelClass:: || its window, and the same as a view
+## code::prAcceptControls:: || a node already carrying settings, read back
+::
+
+CLASSMETHODS::
+
+METHOD:: new
+Drive a control on a node.
+
+ARGUMENT:: target
+An Ndef, a Synth, a Group - anything that answers to code::set:: - or nil.
+
+ARGUMENT:: controlName
+The control prefix on it; the subclass's link::#*controlName:: if left out.
+
+METHOD:: onBus
+A node of its own, in place on a bus. Nothing is built until it is switched on. Evaluating the same line again replaces the unit it made before, as an Ndef does: one unit per server, bus, class, control name, target and add action, and making another in that place frees the one before. Give a different code::controlName:: or target to keep two. A freed unit makes no node again; it warns once when asked to. A unit switched on comes back after a cmd-period or a reboot, until it is freed: keep it in a variable to free it.
+
+ARGUMENT:: bus
+An index, a link::Classes/Bus::, or - with BusManager installed - a name.
+ARGUMENT:: numChannels
+ARGUMENT:: target
+ARGUMENT:: addAction
+Where the node goes in the tree; the tail of the default group by default.
+ARGUMENT:: server
+ARGUMENT:: controlName
+Only tells two units of one class apart in the same place; the subclass's link::#*controlName:: if left out. The node itself reads the subclass's control whatever is given here.
+
+METHOD:: controlName
+METHOD:: fade
+METHOD:: ar
+METHOD:: defName
+METHOD:: synthDef
+METHOD:: guiClass
+METHOD:: panelClass
+What a subclass provides - see above.
+
+METHOD:: def
+The in place def for a channel count, built once and kept.
+
+METHOD:: prEnsureDef
+Whether the def is on a server; if not it is sent, and code::done:: is called
+once it has arrived. What keeps a node from being asked for before its def.
+
+INSTANCEMETHODS::
+
+METHOD:: enabled
+On or off - see above. Setting it does whatever the mode calls for.
+
+METHOD:: isActive
+The same.
+
+METHOD:: target
+The node this drives, or nil. Setting one pushes the settings at it, or adopts
+the ones it carries.
+
+METHOD:: controlName
+METHOD:: onName
+The control prefix, and the on/off control's name.
+
+METHOD:: isDriving
+METHOD:: isOnBus
+Which mode this is in.
+
+METHOD:: synth
+The node of its own, or nil.
+
+METHOD:: server
+METHOD:: bus
+METHOD:: numChannels
+Where a node of its own runs.
+
+METHOD:: chain
+The link::Classes/FxChain:: this belongs to, or nil.
+
+METHOD:: label
+What a window calls it.
+
+METHOD:: action
+A function called on every change, with the unit and what changed. The
+compressor's sidechain eq reports through this.
+
+METHOD:: analysisPlacement
+METHOD:: analysisBusIndex
+METHOD:: analysisChannels
+METHOD:: analysisAvailable
+Where an analyser reading this effect's output goes in the tree, as
+code::[target, addAction]::, which bus it reads and how many channels: after a
+node of its own; at the tail of a driven proxy's group, on the proxy's bus. A
+driven Synth does not know its bus, so link::#-analysisBus:: has to be set by
+hand before a spectrum can be drawn.
+
+METHOD:: analysisBus
+An override for the bus an analyser reads.
+
+METHOD:: gui
+Its window, made on the first ask and brought to front after that.
+
+METHOD:: panel
+The same controls as a view, for a window that shows several effects.
+
+METHOD:: asDict
+METHOD:: fromDict
+code::(enabled:, settings:):: by default; a subclass may write another shape.
+
+METHOD:: free
+Drops the node, closes the window, leaves the chain.
+
+EXAMPLES::
+
+code::
+s.boot;
+Ndef(\pad, { var sig = Saw.ar([110, 110.7]) * 0.1; ParaEQ.ar(sig, \eq) }).play;
+e = ParaEQ(Ndef(\pad), \eq);
+e.isDriving;                 // true
+e.enabled = false;           // Ndef(\pad).nodeMap[\eqOn] is 0 now
+Ndef(\pad).nodeMap[\eq];     // the fifteen numbers
+e.free;
+Ndef(\pad).clear;
+::

@@ -1,0 +1,67 @@
+TITLE:: FxPresetStore
+summary:: named settings - the ones the library ships and yours
+categories:: Libraries>ParaEQ
+related:: Classes/ParaEQ, Classes/Compressor, Classes/FxUnit
+
+DESCRIPTION::
+Every effect class keeps one of these: a list of the presets it was written
+with, and after them the ones you have saved, which live in a file of your own
+between sessions. The store does not care what a preset holds - an array of eq
+bands, an Event of compressor settings - only that it can be written with
+code::asCompileString:: and read back with code::load::.
+
+code::
+ParaEQ.presetStore.names;
+ParaEQ.presetStore.at(\warm);
+ParaEQ.presetStore.add("my room", ParaEQ.defaultBands);
+ParaEQ.presetStore.remove("my room");
+::
+
+A name the library ships is refused rather than shadowed: those are what every
+saved kit and chain is written against. Adding, removing and clearing announce
+code::\presets:: on the owning class, so every open window hears about it.
+
+CLASSMETHODS::
+
+METHOD:: new
+ARGUMENT:: owner
+The class that announces code::\presets::.
+ARGUMENT:: builtins
+code::name, data, name, data...:: in menu order.
+ARGUMENT:: file
+Where your presets are kept.
+ARGUMENT:: legacyFile
+Read once if code::file:: does not exist yet, and written under the new name.
+
+INSTANCEMETHODS::
+
+METHOD:: all
+METHOD:: names
+The built in ones first, then yours. Reading them is what brings yours in from
+disk.
+
+METHOD:: at
+A copy of one preset's data, or nil.
+
+METHOD:: includes
+METHOD:: isBuiltin
+METHOD:: isUser
+
+METHOD:: detect
+The name some settings are, or nil once you have moved something.
+
+METHOD:: add
+Keep some settings under a name. Writing over one of yours is fine; a built in
+name is refused. Answers the name, or nil.
+
+METHOD:: remove
+Drop one of yours.
+
+METHOD:: clear
+Drop all of yours, on disk as well.
+
+METHOD:: file
+METHOD:: legacyFile
+METHOD:: owner
+METHOD:: builtins
+METHOD:: userPresets

@@ -1,0 +1,137 @@
+TITLE:: FxRack
+summary:: chains of effects side by side inside a chain, lined up in time
+categories:: Libraries>ParaEQ
+related:: Classes/FxChain, Classes/FxUnit, Classes/FxRackBranch, Classes/Compressor
+
+DESCRIPTION::
+An effect whose inside is several chains in parallel. What comes in goes to
+every chain, what comes out of them is added up. It is an link::Classes/FxUnit::,
+so it goes in an link::Classes/FxChain::, is switched on and off, and is saved
+with the chain like any other effect.
+
+code::
+(
+r = FxChain.master.add(FxRack());        // one chain to begin with: nothing changes
+r.branches[0].name = "squash";
+r.branches[0].chain.add(Compressor()).enabled = true;
+b = r.addBranch("dry");                  // a second chain, empty: the dry sound
+b.level = -6;
+r.enabled = true;
+);
+::
+
+An empty chain passes the sound, so every chain that is added adds that much
+level until something is put in it or its level is taken down.
+
+subsection:: Latency
+
+An effect that cannot help being late - a compressor's lookahead, a limiter, an
+fft - says by how much with link::Classes/FxUnit#-latency::. The rack adds up what
+is on in each chain and holds every other chain back by the difference, so what
+is added up is in time and a dry chain beside a late one does not comb. Delays
+are whole samples.
+
+When a latency changes the rack waits link::#*settle:: seconds for it to stand
+still, then crossfades to the new delays over link::#*crossfade:: seconds.
+
+A rack lines up only what is declared: an effect that is late and answers 0
+stays out of line.
+
+subsection:: On the server
+
+Where an effect has a synth a rack has a group. In it, in order: a copy of the
+bus onto each chain's own bus, then each chain's group followed by that chain's
+delay and level onto a sum, then the sum back onto the bus, faded in and out
+like any effect. Switched off, the group is freed. The rack owns the buses and
+gives them back when it is freed or leaves its chain. After cmd-period or a
+reboot the chain it is in builds it again.
+
+Each chain's delay line is link::#*delayFrames:: frames a channel, taken from the
+server's real time memory.
+
+CLASSMETHODS::
+
+METHOD:: new
+A rack with one empty chain, called "a". Add it to a chain to use it.
+
+METHOD:: crossfade
+Seconds a change of delay takes. Default 0.03.
+
+METHOD:: settle
+Seconds a latency has to stand still before the delays follow. Default 0.25.
+
+METHOD:: delayFrames
+The length of each channel's delay line: 32768 frames, 0.68 s at 48 kHz. A chain
+that would have to wait longer stays out of line, and the rack says so once.
+
+INSTANCEMETHODS::
+
+METHOD:: branches
+The chains, an Array of link::Classes/FxRackBranch::.
+
+METHOD:: addBranch
+Another chain beside the others, empty.
+
+ARGUMENT:: name
+What it is called; the next free letter when nil.
+
+RETURNS:: the link::Classes/FxRackBranch::.
+
+METHOD:: removeBranch
+Takes a chain out, with its effects. The last chain stays.
+
+ARGUMENT:: which
+A branch, or its index.
+
+METHOD:: branchAt
+ARGUMENT:: which
+An index, or a name.
+
+RETURNS:: the link::Classes/FxRackBranch::, or nil.
+
+METHOD:: numBranches
+How many chains.
+
+METHOD:: latency
+How late the rack is, in seconds: its latest chain that is lined up. A chain
+with code::align:: off does not count. The rack says code::changed(\latency)::
+when it changes, so a rack in a chain of another rack is lined up too.
+
+METHOD:: live
+Set true and no chain is held back: nothing is added to the latency, and the
+chains are out of line by whatever each one costs.
+
+METHOD:: shown
+The index of the chain a strip shows the effects of. Saved with the rack.
+
+METHOD:: depth
+0 in a chain of its own, 1 in a chain of another rack. A rack does not go deeper:
+link::Classes/FxChain#-add:: answers nil and says why.
+
+METHOD:: anySolo
+Whether a chain is soloed.
+
+METHOD:: settings
+What a preset holds: code::live::, code::shown::, and for every chain its name,
+level, mute, solo, align and effects. Setting it makes the rack exactly those
+chains.
+
+EXAMPLES::
+
+A compressor in parallel with the dry sound, in time:
+
+code::
+(
+c = FxChain(\bus16, 16, 2);
+r = c.add(FxRack());
+r.branches[0].chain.add(Compressor()).enabled = true;
+r.branches[0].chain.units[0].lookahead = 0.01;
+r.addBranch("dry");
+r.enabled = true;
+);
+r.branches[1].heldBack;   // 0.01: the dry chain waits for the compressor
+r.latency;                // 0.01
+r.live = true;            // nothing held back
+r.gui;
+c.free;
+::

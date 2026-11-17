@@ -1,0 +1,30 @@
+TITLE:: FxChainGUI
+summary:: a chain of effects in a window of its own
+categories:: Libraries>ParaEQ
+related:: Classes/FxChain, Classes/FxChainPanel
+
+DESCRIPTION::
+A link::Classes/FxChainPanel:: and the one-line footer every effect window has: the
+hint at the left, the chain at the right ("bus 0 · 2 ch · 2 effects · on"). What
+code::chain.gui:: opens. 1000 wide, and as tall as the tallest of its effects' own
+windows with the chain's two rows on top (600 at the least).
+
+code::
+FxChain.master.gui;
+::
+
+CLASSMETHODS::
+
+METHOD:: new
+ARGUMENT:: chain
+ARGUMENT:: x
+ARGUMENT:: y
+
+INSTANCEMETHODS::
+
+METHOD:: chain
+METHOD:: window
+METHOD:: panel
+METHOD:: hints
+METHOD:: front
+METHOD:: close

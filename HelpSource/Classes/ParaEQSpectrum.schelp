@@ -1,0 +1,98 @@
+TITLE:: ParaEQSpectrum
+summary:: what an eq is working on, drawn behind its curve
+categories:: Libraries>ParaEQ
+related:: Classes/ParaEQ, Classes/ParaEQView, Classes/ParaEQPanel, Classes/FFT
+
+DESCRIPTION::
+One FFT on the bus just after the eq, read back into the language a frame at a
+time, and reduced to the loudest bin in each of 64 log spaced bands - a peak
+reading of everything going through, honest about where the energy is, which is
+what an eq is aimed by.
+
+code::
+spectrum = ParaEQSpectrum(eq);
+spectrum.action = { { eqView.refresh }.defer };
+spectrum.running = true;         // while the eq page is up
+spectrum.levels;                 // 64 dB values, loud-fast and slow-falling
+spectrum.freqs;                  // the frequency each one sits at
+spectrum.free;                   // in window.onClose
+::
+
+Where it reads is the eq's business - link::Classes/FxUnit#-analysisPlacement::.
+An eq with a node of its own is read just after that node; an eq driving an Ndef
+at the tail of the Ndef's group, on the Ndef's bus; an eq driving a plain Synth
+has no bus to read until its code::analysisBus:: is set. An eq that is off has
+no picture, and nothing is analysed unless a window has asked - no synth, no
+buffer, no polling.
+
+The whole frame is read rather than reduced on the server: a band near the top
+of the range covers a hundred bins, and a tone in it is in one of them, so
+sampling a few would miss it.
+
+CLASSMETHODS::
+
+METHOD:: new
+ARGUMENT:: eq
+A link::Classes/ParaEQ::, or nil for one to be pointed later.
+
+METHOD:: on
+A class wide switch - the panel's strong::spectrum:: box. Off, nothing is drawn
+or analysed anywhere.
+
+METHOD:: fftSize
+4096.
+METHOD:: numBands
+64, log spaced between link::#*minFreq:: and link::#*maxFreq::.
+METHOD:: pollRate
+Frames a second read from the server. 15.
+METHOD:: syncRate
+How often the node is checked. 2.
+METHOD:: floorDb
+METHOD:: topDb
+The scale the trace is drawn on: -78 and 6.
+METHOD:: fallDb
+METHOD:: peakFallDb
+How fast the trace and the mark over it fall back, dB a second.
+METHOD:: dbTrim
+METHOD:: minFreq
+METHOD:: maxFreq
+
+METHOD:: rebuild
+Forget everything worked out from the settings above, defs included, so a change
+takes.
+
+METHOD:: freqs
+METHOD:: bandBins
+METHOD:: fetchCount
+METHOD:: defName
+METHOD:: synthDef
+METHOD:: normalise
+
+INSTANCEMETHODS::
+
+METHOD:: eq
+The eq analysed. Setting another moves the analyser and starts the trace again.
+
+METHOD:: running
+Whether a picture is being made at all.
+
+METHOD:: visible
+Running, switched on, and with somewhere to read.
+
+METHOD:: levels
+METHOD:: peaks
+METHOD:: freqs
+What the view draws.
+
+METHOD:: levelAt
+The level now at a frequency, in dB - the band it falls in - or nil before the
+first frame: what the eq window's pointer readout says.
+ARGUMENT:: freq
+
+METHOD:: action
+Called with the spectrum whenever a frame has been taken.
+
+METHOD:: server
+
+METHOD:: free
+Stops, and gives the buffer back.

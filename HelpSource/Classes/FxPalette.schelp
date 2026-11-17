@@ -1,0 +1,52 @@
+TITLE:: FxPalette
+summary:: the colours and fonts every effect window is drawn in
+categories:: Libraries>ParaEQ
+related:: Classes/ParaEQGUI, Classes/CompressorGUI, Classes/ModulePalette
+
+DESCRIPTION::
+The same values the module family, Insight and ServerPanel use, so an eq opened
+from a pad, from the master chain or from an Ndef looks like one instrument.
+
+code::
+FxPalette.bg;
+FxPalette.eqBand(2);
+FxPalette.label("freq", 30);
+FxPalette.button("flat", 40, { "flat".postln });
+::
+
+CLASSMETHODS::
+
+METHOD:: bg
+METHOD:: panel
+METHOD:: text
+METHOD:: dim
+METHOD:: accent
+METHOD:: wave
+METHOD:: waveDim
+METHOD:: waveBg
+METHOD:: handle
+METHOD:: sel
+METHOD:: good
+METHOD:: clip
+METHOD:: peak
+The colours.
+
+METHOD:: eqBands
+METHOD:: eqBand
+One colour per eq band, left to right, so the colour says which end of the
+spectrum a handle belongs to.
+
+METHOD:: font
+METHOD:: smallFont
+METHOD:: boldFont
+METHOD:: monoFont
+
+METHOD:: label
+A small dim link::Classes/StaticText::.
+
+METHOD:: button
+A one state link::Classes/Button:: in the house colours.
+
+METHOD:: darken
+Give a window the dark palette, so the Qt widgets that are not coloured by hand
+come out like the rest.

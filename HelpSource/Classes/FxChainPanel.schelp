@@ -1,0 +1,56 @@
+TITLE:: FxChainPanel
+summary:: a chain's effects, one at a time under a tab each
+categories:: Libraries>ParaEQ
+related:: Classes/FxChain, Classes/FxChainGUI, Classes/ParaEQPanel, Classes/CompressorPanel
+
+DESCRIPTION::
+The chain's row - power, its name and bus, the chain presets, a button per effect
+class that is installed and a menu of sc fx kit's effects - then a tab per effect,
+in the order the sound goes through them, left to right, and under the tabs the
+panel of the effect chosen: the same panel its own window shows. One at a time,
+because an effect's panel is a whole device - a display and its cards - and two of
+them no longer stack in one window. A tab whose effect is off is dim.
+
+strong::earlier:: and strong::later:: move the effect shown one place along the
+chain, strong::remove:: takes it out. The panel follows the chain: an effect added
+from code turns up and is shown, one removed goes away, and the effect shown stays
+shown when the chain moves it. Only the shown effect's panel runs its analysis.
+
+code::
+(
+c = FxChain.master;
+w = Window("chain", Rect(100, 100, 1000, 620)).front;
+p = FxChainPanel(c);
+h = FxHintBar();
+w.layout = VLayout(p.view, h.view);
+p.hints = h;
+p.running = true;             // the analysis of the effect shown
+w.onClose = { p.remove };
+);
+p.shown = 1;                  // the second effect
+::
+
+link::Classes/ServerPanel:: opens it from its fx button; link::Classes/FxChainGUI::
+puts it in a window.
+
+CLASSMETHODS::
+
+METHOD:: new
+ARGUMENT:: chain
+ARGUMENT:: parent
+
+INSTANCEMETHODS::
+
+METHOD:: chain
+METHOD:: view
+METHOD:: panels
+The effects' panels, in order.
+METHOD:: shown
+Which effect is shown, by its place in the chain.
+METHOD:: shownPanel
+The panel of the effect shown, or nil.
+METHOD:: running
+Whether the effect shown runs its analysis; the others never do.
+METHOD:: hints
+METHOD:: refresh
+METHOD:: remove

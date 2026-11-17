@@ -1,0 +1,164 @@
+TITLE:: FxChain
+summary:: a series of effects on a bus, in place, in order
+categories:: Libraries>ParaEQ
+related:: Classes/FxUnit, Classes/ParaEQ, Classes/Compressor, Classes/FxChainGUI, Classes/FxChainPanel, Classes/ServerPanel
+
+DESCRIPTION::
+One group on the server, a list of link::Classes/FxUnit::s inside it, all
+working on the same bus one after another. The one everybody wants is the master
+chain - an eq and a compressor on the main out - and that is what
+link::Classes/ServerPanel::'s code::fx:: section opens:
+
+code::
+c = FxChain.master;              // bus 0, every output channel
+c.units;                         // -> [ParaEQ, Compressor] when Compressor is installed
+c.eq.enabled = true;
+c.eq.preset = \warm;
+c.compressor.threshold = -18;
+c.gui;
+::
+
+but any bus will do, and any effects:
+
+code::
+c = FxChain(\verb, bus: 16, numChannels: 2);
+c.add(ParaEQ.new);
+c.add(Compressor.new);
+::
+
+subsection:: Where it sits
+
+The group is built after the default group when the server comes up and again
+after cmd + period, so the chain hears everything that plays, and whatever reads
+the bus at the tail of the root node - ServerPanel's meters, a recorder, Insight -
+hears the chain. The server's own volume synth is made after the default group
+too, and later, so it lands before the chain: the volume knob is a trim into the
+chain rather than a fader after it.
+
+An effect that is off has no node. An effect's node goes after the node of the
+effect before it, so the order of link::#-units:: is the order on the bus; and
+that node exists exactly when the effect is on, the chain is on and the server is
+up - the one thing this class has to get right.
+
+subsection:: Presets
+
+The whole chain writes to one file and reads it back, effect by effect, so a
+master setting travels as one thing. The folder is next to the class files and
+ignored by git.
+
+code::
+c.savePreset("tonight");         // -> <sc EQ>/presets/tonight.scd
+c.loadPreset("tonight");
+FxChain.presetNames;
+::
+
+A preset entry lands on the effect of the same class at that position, on the
+first effect of that class otherwise, and makes a new one when there is none and
+the class is installed. A class that is not installed is skipped and named.
+
+CLASSMETHODS::
+
+METHOD:: new
+A chain under a name. Making another under a taken name frees the old one first.
+
+ARGUMENT:: name
+ARGUMENT:: bus
+An index, a link::Classes/Bus::, or a BusManager name.
+ARGUMENT:: numChannels
+ARGUMENT:: server
+ARGUMENT:: target
+ARGUMENT:: addAction
+Where the group goes; after the default group by default. A function answering
+a node is evaluated at tree time.
+
+METHOD:: master
+The chain on a server's main out, made the first time it is asked for, with a
+link::Classes/ParaEQ:: and - when that extension is installed - a
+link::Classes/Compressor:: in it, both off. One per server.
+
+METHOD:: at
+METHOD:: names
+METHOD:: freeAll
+The registry.
+
+METHOD:: presetDir
+METHOD:: presetPath
+METHOD:: presets
+METHOD:: presetNames
+The preset folder and what is in it, newest first.
+
+INSTANCEMETHODS::
+
+METHOD:: add
+Put an effect in the chain, at the end or at code::index::. It leaves whatever it
+was doing before and takes this chain's bus and channel count.
+
+METHOD:: remove
+Take one out; its node is faded away.
+
+METHOD:: units
+The effects, in order on the bus.
+
+METHOD:: at
+METHOD:: size
+
+METHOD:: eq
+METHOD:: compressor
+The first effect of that class, or nil.
+
+METHOD:: unitOfClass
+
+METHOD:: moveUnit
+Move one effect to another position. The nodes are moved, not rebuilt.
+
+METHOD:: enabled
+The chain as a whole: off, every node is faded out and the bus is left alone,
+whatever each effect says for itself.
+
+METHOD:: group
+The group on the server, or nil while it is down.
+
+METHOD:: name
+METHOD:: server
+METHOD:: bus
+METHOD:: numChannels
+
+METHOD:: savePreset
+METHOD:: loadPreset
+METHOD:: presetName
+METHOD:: presetFile
+METHOD:: asDict
+METHOD:: fromDict
+The whole chain as one preset - see above.
+
+METHOD:: gui
+METHOD:: closeGui
+METHOD:: panel
+A window - link::Classes/FxChainGUI:: - opened or closed, or the same as a
+view. The window is made once and brought to the front after that, and both
+ways round announce code::\gui::, so a button elsewhere that opens it -
+ServerPanel's code::fx:: - can keep its light right without asking.
+
+METHOD:: analysisPlacement
+Where an analyser reading the whole chain goes: the tail of its group.
+
+METHOD:: free
+Removes the hooks, drops the nodes and the group, lets the units go.
+
+EXAMPLES::
+
+code::
+s.boot;
+{ Out.ar(0, PinkNoise.ar(0.1) ! 2) }.play;
+
+c = FxChain.master;
+c.gui;
+c.eq.enabled = true;
+c.eq.preset = \telephone;       // heard on the noise
+c.eq.preset = \flat;
+c.compressor !? { |k| k.enabled = true; k.threshold = -30; k.ratio = 8 };
+c.savePreset("noise test");
+c.enabled = false;               // the whole chain out
+c.enabled = true;
+c.free;
+::
