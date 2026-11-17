@@ -1,6 +1,6 @@
 // =====================================================================
 // FxDevicePanel - an FxParamUnit as a device (the sc-fx-ui rules); its
-// window is FxDeviceGUI (sc EQ)
+// window is FxDeviceGUI
 //
 //   (o) GROWL   < warm tape *     v >  save  ...                  tidal  extras
 //   +-----------------------------------------------------------+ +------+

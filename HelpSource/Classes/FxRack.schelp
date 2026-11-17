@@ -1,6 +1,6 @@
 TITLE:: FxRack
 summary:: chains of effects side by side inside a chain, lined up in time
-categories:: Libraries>ParaEQ
+categories:: Libraries>FxKit
 related:: Classes/FxChain, Classes/FxUnit, Classes/FxRackBranch, Classes/Compressor
 
 DESCRIPTION::

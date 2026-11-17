@@ -1,10 +1,12 @@
 TITLE:: FxUnit
 summary:: what an effect is, whichever graph it ends up in
-categories:: Libraries>ParaEQ
+categories:: Libraries>FxKit
 related:: Classes/ParaEQ, Classes/Compressor, Classes/FxChain, Classes/FxPresetStore, Classes/NodeProxy
 
 DESCRIPTION::
-The base of link::Classes/ParaEQ:: and link::Classes/Compressor::. An effect
+The base of every effect of the family: link::Classes/FxParamUnit:: and the
+effects written as a table, link::Classes/ParaEQ:: and link::Classes/Compressor::
+(each in its own extension) and link::Classes/FxRack::. An effect
 here is two things that agree with each other: a piece of DSP written as a
 pseudo-UGen that reads named controls, and an object that holds the settings and
 pushes them at whatever node is running that DSP. The same DSP runs in three

@@ -1,6 +1,6 @@
 TITLE:: FxChainGUI
 summary:: a chain of effects in a window of its own
-categories:: Libraries>ParaEQ
+categories:: Libraries>FxKit
 related:: Classes/FxChain, Classes/FxChainPanel
 
 DESCRIPTION::

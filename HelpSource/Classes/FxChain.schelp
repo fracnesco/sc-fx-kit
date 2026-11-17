@@ -1,6 +1,6 @@
 TITLE:: FxChain
 summary:: a series of effects on a bus, in place, in order
-categories:: Libraries>ParaEQ
+categories:: Libraries>FxKit
 related:: Classes/FxUnit, Classes/ParaEQ, Classes/Compressor, Classes/FxChainGUI, Classes/FxChainPanel, Classes/ServerPanel
 
 DESCRIPTION::
@@ -11,7 +11,7 @@ link::Classes/ServerPanel::'s code::fx:: section opens:
 
 code::
 c = FxChain.master;              // bus 0, every output channel
-c.units;                         // -> [ParaEQ, Compressor] when Compressor is installed
+c.units;                         // -> [ParaEQ, Compressor], each when installed
 c.eq.enabled = true;
 c.eq.preset = \warm;
 c.compressor.threshold = -18;
@@ -47,7 +47,7 @@ master setting travels as one thing. The folder is next to the class files and
 ignored by git.
 
 code::
-c.savePreset("tonight");         // -> <sc EQ>/presets/tonight.scd
+c.savePreset("tonight");         // -> <sc fx kit>/presets/tonight.scd
 c.loadPreset("tonight");
 FxChain.presetNames;
 ::
@@ -73,8 +73,8 @@ a node is evaluated at tree time.
 
 METHOD:: master
 The chain on a server's main out, made the first time it is asked for, with a
-link::Classes/ParaEQ:: and - when that extension is installed - a
-link::Classes/Compressor:: in it, both off. One per server.
+link::Classes/ParaEQ:: and a link::Classes/Compressor:: in it, both off - each
+when its extension (sc EQ, sc compressor) is installed. One per server.
 
 METHOD:: at
 METHOD:: names

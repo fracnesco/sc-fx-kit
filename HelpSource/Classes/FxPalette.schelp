@@ -1,6 +1,6 @@
 TITLE:: FxPalette
 summary:: the colours and fonts every effect window is drawn in
-categories:: Libraries>ParaEQ
+categories:: Libraries>FxKit
 related:: Classes/ParaEQGUI, Classes/CompressorGUI, Classes/ModulePalette
 
 DESCRIPTION::

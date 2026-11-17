@@ -1,6 +1,6 @@
 TITLE:: FxChainPanel
 summary:: a chain's effects, one at a time under a tab each
-categories:: Libraries>ParaEQ
+categories:: Libraries>FxKit
 related:: Classes/FxChain, Classes/FxChainGUI, Classes/ParaEQPanel, Classes/CompressorPanel
 
 DESCRIPTION::

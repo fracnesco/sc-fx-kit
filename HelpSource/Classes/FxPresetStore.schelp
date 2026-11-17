@@ -1,6 +1,6 @@
 TITLE:: FxPresetStore
 summary:: named settings - the ones the library ships and yours
-categories:: Libraries>ParaEQ
+categories:: Libraries>FxKit
 related:: Classes/ParaEQ, Classes/Compressor, Classes/FxUnit
 
 DESCRIPTION::

@@ -1,6 +1,6 @@
 TITLE:: FxRackBranch
 summary:: one chain of a rack: its effects, level, mute, solo and place in the line-up
-categories:: Libraries>ParaEQ
+categories:: Libraries>FxKit
 related:: Classes/FxRack, Classes/FxChain
 
 DESCRIPTION::

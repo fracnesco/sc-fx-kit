@@ -1,6 +1,6 @@
 TITLE:: ParaEQSpectrum
 summary:: what an eq is working on, drawn behind its curve
-categories:: Libraries>ParaEQ
+categories:: Libraries>FxKit
 related:: Classes/ParaEQ, Classes/ParaEQView, Classes/ParaEQPanel, Classes/FFT
 
 DESCRIPTION::

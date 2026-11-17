@@ -1,6 +1,6 @@
 TITLE:: FxHintBar
 summary:: a strip that says what the mouse is over
-categories:: Libraries>ParaEQ
+categories:: Libraries>FxKit
 related:: Classes/ParaEQGUI, Classes/CompressorGUI, Classes/FxChainGUI, Classes/ModuleHintBar
 
 DESCRIPTION::
