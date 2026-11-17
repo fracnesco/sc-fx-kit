@@ -15,10 +15,13 @@
 // ln -s is macOS and Linux. On Windows, use the quark, or copy this
 // folder into Platform.userExtensionDir by hand - .openOS opens it.
 //
-// FxKit is built on ParaEQ (../sc EQ), so ParaEQ has to be installed too.
-// If it is sitting next to this folder, this script links it as well.
+// FxKit depends on nothing. Every effect of the family is built on it -
+// ParaEQ (../sc EQ) included - and you will usually not run this one:
+// each effect's install.scd links it.
 //
-// You will usually not run this one: each effect's install.scd links it.
+// Until 2026-11 the framework (FxUnit, FxChain, the widgets...) lived in
+// sc EQ. An sc EQ from before then next to this one holds the same classes
+// again, and the class library will not compile: update it (git pull) too.
 
 (
 var link, src, parent;
@@ -53,29 +56,40 @@ link = { |from, to, what, done|
 	};
 };
 
-link.value(parent +/+ "sc EQ", Platform.userExtensionDir +/+ "ParaEQ", "ParaEQ", {
-	link.value(src, Platform.userExtensionDir +/+ "FxKit", "FxKit", {
-		"".postln;
-		"Now recompile the class library: ctrl/cmd + shift + L".postln;
-	});
+// an sc EQ from before the move holds the framework too: say so before
+// the compile does, in fewer words
+[parent +/+ "sc EQ", Platform.userExtensionDir +/+ "ParaEQ"].do { |dir|
+	if (File.exists(dir +/+ "classes/FxUnit.sc")) {
+		("FxKit: % is an older sc EQ that still holds FxUnit and the rest of the"
+			"\n  framework, which now lives here. Update it (git pull) or the class"
+			"\n  library will not compile - every Fx class twice.".format(dir)).warn;
+	};
+};
+
+link.value(src, Platform.userExtensionDir +/+ "FxKit", "FxKit", {
+	"".postln;
+	"Now recompile the class library: ctrl/cmd + shift + L".postln;
 });
 )
 
 
 // ---------------------------------------------------------------- verify
 (
-var missing = [\FxParamUnit, \FxParamPanel, \FxParamGUI, \FxParamView, \FxLevelBars, \FxLoop, \FxLfo, \FxKit, \FxCubeWarp]
+var missing = [\FxUnit, \FxChain, \FxRack, \FxStrip, \FxKnob, \FxPalette, \FxPresetStore, \FxHintBar,
+	\FxParamUnit, \FxParamPanel, \FxParamGUI, \FxParamView, \FxLevelBars, \FxLoop, \FxLfo, \FxKit, \FxCubeWarp]
 	.select { |sym| sym.asClass.isNil };
 
 if (missing.notEmpty) {
 	("FxKit is not compiled - % is missing."
 		"\n  Recompile the class library, ctrl/cmd + shift + L, and check the"
-		"\n  post window for compile errors - a missing ParaEQ is the usual reason."
+		"\n  post window for compile errors - duplicate Fx classes mean an old sc EQ"
+		"\n  is installed too: update it."
 		.format(missing.join(", "))).warn;
 } {
 	"FxKit is installed.".postln;
-	"  effects built on it: %".format(FxParamUnit.allSubclasses.collect(_.name).join(", ")).postln;
-	"  help:  FxParamUnit, then cmd+d".postln;
+	"  effects built on it: %".format(FxUnit.allSubclasses.collect(_.name).join(", ")).postln;
+	"  a chain:  FxChain.master.gui        a table effect:  FxParamUnit, then cmd+d".postln;
+	"  help:     FxUnit, then cmd+d".postln;
 };
 )
 
